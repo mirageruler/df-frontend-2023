@@ -1,14 +1,80 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Bookstore</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
-  </head>
+<html lang="en">
 
-  <body>
-    Hello world
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Bookstore CMS</title>
+</head>
+
+<body>
+<!-- Header -->    
+    <div id="bookstore-cms-header">
+        <div class="bookstore-cms-header-container">
+            <div id="picture-frame"><img src="df-logo.png" alt="user avatar"></div>
+            <div id="app-name"><h1>Bookstore</h1></div>
+            <div id="profile">
+                <div id="avatar">
+                    <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="user avatar">
+                </div>
+                <div id="profile-name">John Doe</div>
+            </div>
+        </div>
+    <hr>
+    </div>
+
+<!-- Search textbox -->    
+    <div class="search">
+        <input type="text" id="searchTitle" class="search-input" placeholder="Enter title to search books (case insensitive)">
+        <button id="addBookButton" class="dwarf-button" onclick="openAddBookDialog()">Add Book</button>
+    </div>
+
+<!-- Table to display books -->
+    <table id="bookTable">
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Topic</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+<!-- Custom Delete Confirmation Dialog -->
+<div class="custom-dialog-overlay" id="deleteBookDialogOverlay"></div>
+<div id="deleteBookDialog" class="custom-dialog">
+    <div class="dialog-content">
+        <span class="close" onclick="closeDialog('deleteBookDialog')">&times;</span>
+        <h2>Delete book</h2>
+        <p id="deleteConfirmationText"></p>
+        <button id="modalDeleteButton" class="normal-button">Delete</button>
+        <button class="dwarf-button" onclick="closeDialog('deleteBookDialog')">Cancel</button>
+    </div>
+</div>
+
+<!-- Custom Add Book Dialog -->
+<div class="custom-dialog-overlay" id="addBookDialogOverlay"></div>
+<div id="addBookDialog" class="custom-dialog">
+    <div class="dialog-content">
+        <span class="close" onclick="closeDialog('addBookDialog')">&times;</span>
+        <h2>Add book</h2>
+        <label for="modalTitle">Title:</label>
+        <input type="text" id="modalTitle" placeholder="Enter title...">
+        <label for="modalAuthor">Author:</label>
+        <input type="text" id="modalAuthor" placeholder="Enter author...">
+        <label for="modalTopic">Topic:</label>
+        <select id="modalTopic">
+            <option value="Programming">Programming</option>
+            <option value="Database">Database</option>
+            <option value="DevOps">DevOps</option>
+        </select>
+        <button class="dwarf-button" onclick="addBookFromDialog()">Create</button>
+    </div>
+</div>
+
+
+
     <script src="script.js"></script>
-  </body>
+</body>
+
 </html>
