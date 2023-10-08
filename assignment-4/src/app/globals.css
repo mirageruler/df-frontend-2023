@@ -25,3 +25,10 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.close {
+  color: grey; /* Text color */
+  border: none; /* No border */
+  cursor: pointer;
+  font-size: 30px; /* Adjust the font size as needed */
+}
