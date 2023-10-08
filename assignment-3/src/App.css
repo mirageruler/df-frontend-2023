@@ -1,38 +1,293 @@
-.App {
+body {
+  font-family: Arial, sans-serif;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1 {
+  color: #333;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+table {
+  width: 80%;
+  margin: 20px auto;
+  border-collapse: collapse;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+table, th, td {
+  border: 1px solid #333;
+}
+
+th, td {
+  padding: 10px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.search, .add-book {
+  margin: 20px auto;
+  width: 80%;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
+}
+
+label {
+  margin-right: 10px;
+}
+
+input[type="text"] {
+  height: 3em;
+  width: 100%;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+/* Add this CSS to style the search input */
+.search-input {
+  flex: 1; /* This will make the input expand to fill available space */
+  margin-right: 10px; /* Add margin to the right */
+  padding: 5px;
+  width: auto; /* Remove fixed width to allow it to shrink */
+}
+
+.header-table {
+  width: 100%;
+  border: hidden;
+  border-bottom: black 1px solid;
+  background-color: white;
+}
+
+.header tr {
+  vertical-align: center;
+}
+
+/* Styles for the modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 5px;
+  position: relative;
+}
+
+/* Styles for the Delete button */
+.delete-button {
+  background-color: transparent;
+  border: none;
+  color: #E13F5E;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Styling for the overlay background */
+.custom-dialog-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 999; /* Ensure it's above other content */
+}
+
+/* Styling for the dialog box */
+.custom-dialog {
+  display: none;
+  position: fixed;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000; /* Ensure it's above the overlay */
+}
+
+.dialog-content {
+  background-color: #fff;
+  padding: 20px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 5px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles for the buttons within the custom dialogs */
+.dwarf-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #E13F5E; /* Your button background color */
+  color: white; /* Your button text color */
+  border: 2px solid #E13F5E; /* Your button border color */
+  border-radius: 4px; /* Add some border-radius for a slightly rounded appearance */
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.normal-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: white; /* Your button background color */
+  color: black; /* Your button text color */
+  border: 2px solid white; /* Your button border color */
+  border-radius: 4px; /* Add some border-radius for a slightly rounded appearance */
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.bookstore-cms-header {
+  text-align: center;
+  padding: 10px;
+}
+
+.bookstore-cms-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picture-frame, .app-name, .profile {
+  display: flex; /* Add this to make the avatar and profile-name align horizontally */
+  align-items: center; /* Add this to vertically center avatar and profile-name */
+}
+
+.picture-frame {
+  text-align: left;
+}
+
+.app-name {
+  /* Center the app-name horizontally and vertically */
+  text-align: center;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
+.profile {
+  text-align: right;
+  justify-content: flex-end; /* Align the profile to the right */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.avatar {
+  width: 50px; /* Adjust the size of the circle */
+  height: 50px; /* Same size as width for a perfect circle */
+  border-radius: 50%; /* Creates a circular shape */
+  overflow: hidden; /* Hides any content outside the circle */
+  margin-right: 10px; /* Adjust spacing between avatar and profile name */
+}
+
+.close {
+  color: grey; /* Text color */
+  border: none; /* No border */
+  cursor: pointer;
+  font-size: 30px; /* Adjust the font size as needed */
+}
+
+.close:hover {
+  color: #007bff; /* Text color on hover */
+}
+
+/* Styling for the header */
+h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Styling for the buttons */
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Styling for labels and input fields */
+label {
+  display: block;
+  margin-top: 10px;
+  /* margin-bottom: 10px; */
+  margin-right: 100%;
+}
+
+select {
+  width: 100%;
+  margin-bottom: 5px;
+  height: 3em;
+}
+
+.Modal-Background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.Modal-Root {
+  display: flex;
+  align-self: center;
+  width: 30%;
+  height: fit-content;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 0.5em;
+  padding: 1em;
+  background-color: #fff;
+}
+
+.Modal-Header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Modal-Body {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.paging {
+  display: flex;
+  justify-content: flex-end;
+  width: 80%;
+  gap: 0.5em;
+  margin: auto;
+}
+
+.active-page {
+  background-color: #E13F5E
 }
