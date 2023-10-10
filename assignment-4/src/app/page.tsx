@@ -1,13 +1,8 @@
 'use client'
 
 import React from 'react'
-import { HomePage } from '../pages/Home'
-import ThemeProvider from '../components/ThemeProvider'
+import BookStore from 'src/components/BookStore'
 
 export default function Home() {
-  return (
-    <ThemeProvider>
-      <HomePage />
-    </ThemeProvider>
-  )
+  return <BookStore />
 }

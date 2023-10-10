@@ -1,8 +1,6 @@
 import { InputHTMLAttributes } from 'react'
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
-  //...add your custom types here
-}
+interface Props extends InputHTMLAttributes<HTMLInputElement> {}
 
 const Input: React.FC<Props> = (props): JSX.Element => {
   return (

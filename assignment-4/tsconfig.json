@@ -29,7 +29,11 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "src/*": ["./src/*"]
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -38,7 +42,8 @@
     "**/*.tsx",
     "**/*.d.ts",
     "**/*.js",
-    "**/*.jsx"
+    "**/*.jsx",
+    "src/pages/BookStore/bookStore"
   ],
   "exclude": ["node_modules"]
 }

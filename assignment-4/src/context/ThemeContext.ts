@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 
 type ContextType = {
@@ -6,6 +8,6 @@ type ContextType = {
 }
 
 export const ThemeContext = React.createContext<ContextType>({
-  theme: 'dark',
+  theme: 'light',
   toggleTheme: () => {},
 })
