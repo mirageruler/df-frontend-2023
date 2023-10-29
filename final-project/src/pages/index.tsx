@@ -149,9 +149,7 @@ export default function Home() {
               </Button>
             </div>
           )}
-          <div className="rounded overflow-hidden">
-            <Chessboard position={gamePosition} onPieceDrop={onDrop} />
-          </div>
+          <Chessboard position={gamePosition} onPieceDrop={onDrop} />
         </div>
       </div>
     </div>
