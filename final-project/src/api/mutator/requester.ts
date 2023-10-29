@@ -5,7 +5,6 @@ import { emitter } from 'utils/emitter'
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 const ACCESS_TOKEN = process.env.NEXT_PUBLIC_ACCESS_TOKEN
 
-
 export const AXIOS_INSTANCE = Axios.create({ baseURL: BASE_URL })
 
 // Interceptors

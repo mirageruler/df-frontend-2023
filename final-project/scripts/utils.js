@@ -42,7 +42,7 @@ const getSvgInfos = () => {
     return {
       componentContent: generateIconComponentContent(
         componentName,
-        svgFilePath,
+        svgFilePath.replace(/\\/g, '/'),
       ),
       componentName,
     }

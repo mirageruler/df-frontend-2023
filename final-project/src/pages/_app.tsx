@@ -1,10 +1,8 @@
 import '../styles/index.css'
 import React from 'react'
 import App from 'next/app'
-import NProgressHandler from 'components/NProgressHandler'
 import Head from 'next/head'
 import { AuthContextProvider } from 'context/auth'
-import { Toaster } from 'components/Toast'
 
 if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
   // eslint-disable-next-line global-require
@@ -39,10 +37,8 @@ class MyApp extends App {
           <meta content="/thumbnail.jpeg" name="twitter:image" />
         </Head>
         <AuthContextProvider>
-          <NProgressHandler />
           <Component {...pageProps} />
         </AuthContextProvider>
-        <Toaster />
       </>
     )
   }

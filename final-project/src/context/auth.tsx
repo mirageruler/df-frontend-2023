@@ -29,9 +29,9 @@ const AuthContextProvider = ({ children }: WithChildren) => {
   })
   const [user, setUser] = useState<Me>()
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (username: string, password: string) => {
     try {
-      const res = await signIn({ email, password })
+      const res = await signIn({ username, password })
       if (res.data) {
         setIsLogin(true)
         window.localStorage.setItem(tokenKey, res.data.accessToken)

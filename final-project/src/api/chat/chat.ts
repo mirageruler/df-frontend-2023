@@ -24,7 +24,7 @@ export const getChatCompletions = (
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
-  },
+    },
     data: openAIRequest,
     params,
   })

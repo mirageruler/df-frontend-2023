@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es6",
+    "module": "commonjs",
     "jsx": "preserve",
     "types": ["jest"],
     "lib": ["dom", "es2017"],
@@ -21,7 +21,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": "./src/",
-    "incremental": true
+    "incremental": true,
+    "noResolve": false,
+    "noImplicitAny": false
   },
   "include": [
     "next-env.d.ts",
@@ -32,5 +34,12 @@
     "./jest.setup.js",
     "./cypress/tests/*.ts"
   ],
-  "exclude": ["node_modules", "**/*.test.ts?x", "**/*.cy.ts"]
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts?x",
+    "**/*.cy.ts",
+    "**/*.spec.ts",
+    "cypress/**/*",
+    "./cypress.config.ts"
+  ]
 }
