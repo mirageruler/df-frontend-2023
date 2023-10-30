@@ -22,12 +22,9 @@ class MyApp extends App {
           <meta content="Chess with GPT" property="og:title" />
           <meta content="@dwarvesf" name="twitter:site" />
           <meta content="summary_large_image" name="twitter:card" />
+          <meta content="Play western chess with chatGPT." name="description" />
           <meta
-            content="Opinionated React template for building web applications at scale."
-            name="description"
-          />
-          <meta
-            content="Opinionated React template for building web applications at scale."
+            content="Play western chess with chatGPT."
             property="og:description"
           />
           <meta content="/thumbnail.jpeg" property="og:image" />
