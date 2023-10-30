@@ -18,11 +18,8 @@ class MyApp extends App {
         <Head>
           <meta content="IE=edge" httpEquiv="X-UA-Compatible" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
-          <title>NextJS boilerplate | Dwarves Foundation</title>
-          <meta
-            content="NextJS boilerplate | Dwarves Foundation"
-            property="og:title"
-          />
+          <title>Chess with GPT</title>
+          <meta content="Chess with GPT" property="og:title" />
           <meta content="@dwarvesf" name="twitter:site" />
           <meta content="summary_large_image" name="twitter:card" />
           <meta
