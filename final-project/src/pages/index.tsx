@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable react/jsx-no-bind */
 import { OpenAIMessage } from 'api'
@@ -27,12 +28,14 @@ export default function Home() {
   const msgs = useRef([] as OpenAIMessage[])
   const botPossibleMoves = useRef([] as string[])
   const recentMove = useRef('')
+  const turnNumber = useRef(1)
 
   useEffect(() => {
     msgs.current = [] // if the previous game is finished, refresh the conversation history
     msgs.current.push({
       role: 'system',
-      content: `You are playing a game of western chess against a user. Please tell me your move in algebraic notation (eg: e2-e4, eg: Be7, eg: Nxc4) and nothing else. Do not mention my moves.`,
+      // content: `You are a chess grandmaster playing black, and your goal is to win as quickly as possible. I will provide the current game score before each of your moves, and your reply should just be your next move in algebraic notation (eg: e2-e4, eg: Be7, eg: Nxc4) and nothing else. The current score:`,
+      content: `You are a chess grandmaster playing black, and your goal is to win as quickly as possible. I will provide the current game score before each of your moves, and your reply should just be your next move in algebraic notation with no other commentary. The current score:`,
     })
   }, [])
 
@@ -67,29 +70,42 @@ export default function Home() {
     )
       return
 
-    const botPossibleMovesString = botPossibleMoves.current.join(' or ')
-    msgs.current.push({
-      role: 'user',
-      content: `I play ${recentMove.current}. Your turn; and you must choose only one move among the following possible moves at this turn: ${botPossibleMovesString}.`,
-    })
+    if (turnNumber.current === 1) {
+      msgs.current.push({
+        role: 'user',
+        content: `${turnNumber.current}. ${recentMove.current}`,
+      })
+    } else {
+      msgs.current[msgs.current.length - 1].content = `${msgs.current[msgs.current.length - 1].content}${turnNumber.current}. ${recentMove.current}`
+    }
 
     // Use the OpenAI API to get the best move
     const openAIResponse = await getChatCompletions({
-      model: 'openai/gpt-3.5-turbo',
+      model: 'openai/gpt-4',
       messages: msgs.current,
     })
 
     if (openAIResponse && openAIResponse.choices) {
       const responseContent = openAIResponse.choices[0].message.content
-
       if (responseContent !== '') {
-        const bestMoves: string[] = responseContent.split(',')
-        if (bestMoves.length > 0) {
-          game.move(bestMoves[0])
-          setGamePosition(game.fen())
-          msgs.current.push({ role: 'assistant', content: `${bestMoves[0]}` })
+        if (responseContent !== "") {
+          try {
+            const botMove = extractValidChessMove(responseContent)
+            if (botMove === null) { 
+              return
+            }
+            game.move(botMove)
+            setGamePosition(game.fen())
+          msgs.current[msgs.current.length - 1].content = `${msgs.current[msgs.current.length - 1].content} ${botMove}\n`
+          turnNumber.current = turnNumber.current + 1
+          } catch (error) {
+            game.reset()
+            setPlayerTurn(true)
+          }
         }
       }
+    } else {
+      return
     }
     setPlayerTurn(true)
   }
@@ -135,6 +151,18 @@ export default function Home() {
     game.reset()
     setPlayerTurn(true)
     location.reload()
+  }
+
+  function extractValidChessMove(input: string): string | null {
+    const chessRegex = /[BRQNK][a-h][1-8]|[BRQNK][a-h]x[a-h][1-8]|[BRQNK][a-h][1-8]x[a-h][1-8]|[BRQNK][a-h][1-8][a-h][1-8]|[BRQNK][a-h][a-h][1-8]|[BRQNK]x[a-h][1-8]|[a-h]x[a-h][1-8]=(B+R+Q+N)|[a-h]x[a-h][1-8]|[a-h][1-8]x[a-h][1-8]=(B+R+Q+N)|[a-h][1-8]x[a-h][1-8]|[a-h][1-8][a-h][1-8]=(B+R+Q+N)|[a-h][1-8][a-h][1-8]|[a-h][1-8]=(B+R+Q+N)|[a-h][1-8]|[BRQNK][1-8]x[a-h][1-8]|[BRQNK][1-8][a-h][1-8]/;
+  
+    const matches = input.match(chessRegex);
+  
+    if (matches && matches.length > 0) {
+      return matches[0]; // Return the first valid chess move found in the input
+    }
+  
+    return null; // Return null if no valid move is found in the input
   }
 
   return (
