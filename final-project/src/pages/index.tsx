@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable react/jsx-no-bind */
 import { OpenAIMessage } from 'api'
-import { Chess, Move } from 'chess.js'
+import { Chess, DEFAULT_POSITION, Move } from 'chess.js'
 import { Button } from 'components/Button'
 import { useMemo, useEffect, useRef, useState } from 'react'
 import { Chessboard } from 'react-chessboard'
@@ -19,12 +19,13 @@ const colMap = new Map([
   ['h', 7],
 ])
 
-let undoStack = [] as Move[];
+let undoStack = [] as Move[]
 
 export default function Home() {
   const game = useMemo(() => new Chess(), [])
   const [matchResult, setMatchResult] = useState('')
   const [playerTurn, setPlayerTurn] = useState(true)
+  const [isJustMakeMove, setIsJustMakeMove] = useState(false)
   const [readyToUndo, setReadyToUndo] = useState(false)
   const [readyToRedo, setReadyToRedo] = useState(false)
   const [gamePosition, setGamePosition] = useState(game.fen())
@@ -53,14 +54,14 @@ export default function Home() {
     }
 
     if (game.turn() === 'b') {
-      if (playerTurn) {
-        return
-      }
-      botPossibleMoves.current = game.moves()
-      if (game.isCheck()) {
-        recentMove.current = `${recentMove.current}+`
-      }
-      makeBOTMove()
+        if (playerTurn) {
+          return
+        }
+        botPossibleMoves.current = game.moves()
+        if (game.isCheck()) {
+          recentMove.current = `${recentMove.current}+`
+        }
+        makeBOTMove()
     }
   }, [game, playerTurn, makeBOTMove])
 
@@ -73,7 +74,7 @@ export default function Home() {
     )
       return
 
-    if (turnNumber.current === 1) {
+    if (msgs.current.length === 1) {
       msgs.current.push({
         role: 'user',
         content: `${turnNumber.current}. ${recentMove.current}`,
@@ -99,7 +100,7 @@ export default function Home() {
               return
             }
             const botMove = game.move(botMoveString)
-            undoStack.push(botMove)
+            console.log("botMove:", botMove)
             setGamePosition(game.fen())
           msgs.current[msgs.current.length - 1].content = `${msgs.current[msgs.current.length - 1].content} ${botMoveString}`
           turnNumber.current = turnNumber.current + 1
@@ -116,10 +117,14 @@ export default function Home() {
     }
     setPlayerTurn(true)
     setReadyToUndo(true)
+    setReadyToRedo(false)
+    setIsJustMakeMove(true)
+    console.log('undoStack by normal move:', undoStack)
   }
 
   const onDrop = (source: string, target: string, piece: string) => {
     if (playerTurn === false) {
+      console.log('What the flip')
       return false
     }
 
@@ -138,15 +143,19 @@ export default function Home() {
       }
     }
 
+    let userMove = {} as Move
     try {
-      const userMove = game.move({
+      userMove = game.move({
         from: source,
         to: target,
         promotion: piece[1].toLowerCase() ?? 'q',
       })
-      undoStack.push(userMove)
     } catch (error) {
       return false
+    }
+
+    if (userMove) {
+      console.log("userMove:", userMove)
     }
 
     setGamePosition(game.fen())
@@ -154,17 +163,9 @@ export default function Home() {
     return true
   }
 
-  const handleRestartGame = () => {
-    // handle restart game
-    undoStack = []
-    setMatchResult('')
-    game.reset()
-    setPlayerTurn(true)
-    location.reload()
-  }
-
   const handleUndo = () => {
-    if (readyToUndo) {
+    console.log('readyToUndo:', readyToUndo)
+    if (isJustMakeMove) {
       const blackMove = game.undo();
     if (blackMove !== null) {
       undoStack.push(blackMove)
@@ -177,22 +178,45 @@ export default function Home() {
     console.log('whiteMove by Undo:', whiteMove)
     setGamePosition(game.fen());
     turnNumber.current = turnNumber.current-1
-    const res = trimStringTillLastNewline(msgs.current[msgs.current.length - 1].content)
-    console.log('After:', res)
-    msgs.current[msgs.current.length - 1].content = res
+    if (turnNumber.current === 0) { turnNumber.current = 1 }
+    msgs.current[msgs.current.length - 1].content = trimStringTillLastNewline(msgs.current[msgs.current.length - 1].content)
     setReadyToRedo(true)
+    } else if (readyToUndo) {
+      const blackMove = game.undo();
+    if (blackMove !== null) {
+      undoStack.unshift(blackMove)
+    }
+    const whiteMove = game.undo();
+    if (whiteMove !== null) {
+      undoStack.unshift(whiteMove)
+    }
+    console.log('blackMove by Undo:', blackMove)
+    console.log('whiteMove by Undo:', whiteMove)
+    setGamePosition(game.fen());
+    turnNumber.current = turnNumber.current-1
+    if (turnNumber.current === 0) { turnNumber.current = 1 }
+    msgs.current[msgs.current.length - 1].content = trimStringTillLastNewline(msgs.current[msgs.current.length - 1].content)
+    setReadyToRedo(true)
+    }
+    setIsJustMakeMove(false)
+    if (game.fen() === DEFAULT_POSITION) {
+      setReadyToUndo(false)
+      // setReadyToRedo(false)
+      // undoStack = []
     }
     console.log('undoStack by Undo:', undoStack)
   }
-  
+
   const handleRedo = () => {
     if (readyToRedo) {
       const blackMove = undoStack.pop()
       if (blackMove) {
+        console.log('blackMove by Redo:', blackMove)
         game.move(blackMove)
       }
       const whiteMove = undoStack.pop()
       if (whiteMove) {
+        console.log('whiteMove by Redo:', whiteMove)
         game.move(whiteMove)
       }
       setGamePosition(game.fen());
@@ -201,39 +225,73 @@ export default function Home() {
       if (undoStack.length === 0) {
         setReadyToRedo(false)
       }
+      setReadyToUndo(true)
     }
-    
+
+    setIsJustMakeMove(false)
     console.log('undoStack by Redo:', undoStack)
   }
 
   function trimStringTillLastNewline(input: string): string {
-    console.log('Before:', input)
     const lastNewlineIndex = input.lastIndexOf('\n');
-    console.log('lastNewlineIndex:', lastNewlineIndex)
 
     if (lastNewlineIndex !== -1) {
-        console.log('TRIMMED!')
         return input.substring(0, lastNewlineIndex);
     } 
-        return input; // If no newline found, return the original string
+        return ""; // If no newline found, return the empty string
   }
-
 
   function extractValidChessMove(input: string): string | null {
-    const chessRegex = /[BRQNK][a-h][1-8]|[BRQNK][a-h]x[a-h][1-8]|[BRQNK][a-h][1-8]x[a-h][1-8]|[BRQNK][a-h][1-8][a-h][1-8]|[BRQNK][a-h][a-h][1-8]|[BRQNK]x[a-h][1-8]|[a-h]x[a-h][1-8]=(B+R+Q+N)|[a-h]x[a-h][1-8]|[a-h][1-8]x[a-h][1-8]=(B+R+Q+N)|[a-h][1-8]x[a-h][1-8]|[a-h][1-8][a-h][1-8]=(B+R+Q+N)|[a-h][1-8][a-h][1-8]|[a-h][1-8]=(B+R+Q+N)|[a-h][1-8]|[BRQNK][1-8]x[a-h][1-8]|[BRQNK][1-8][a-h][1-8]/;
-  
-    const matches = input.match(chessRegex);
-  
+    const chessRegex =
+      /[BRQNK][a-h][1-8]|[BRQNK][a-h]x[a-h][1-8]|[BRQNK][a-h][1-8]x[a-h][1-8]|[BRQNK][a-h][1-8][a-h][1-8]|[BRQNK][a-h][a-h][1-8]|[BRQNK]x[a-h][1-8]|[a-h]x[a-h][1-8]=(B+R+Q+N)|[a-h]x[a-h][1-8]|[a-h][1-8]x[a-h][1-8]=(B+R+Q+N)|[a-h][1-8]x[a-h][1-8]|[a-h][1-8][a-h][1-8]=(B+R+Q+N)|[a-h][1-8][a-h][1-8]|[a-h][1-8]=(B+R+Q+N)|[a-h][1-8]|[BRQNK][1-8]x[a-h][1-8]|[BRQNK][1-8][a-h][1-8]/
+
+    const matches = input.match(chessRegex)
+
     if (matches && matches.length > 0) {
-      return matches[0]; // Return the first valid chess move found in the input
+      return matches[0] // Return the first valid chess move found in the input
     }
-  
-    return null; // Return null if no valid move is found in the input
+
+    return null // Return null if no valid move is found in the input
   }
 
+  const handleRestartGame = () => {
+    // handle restart game
+    undoStack = []
+    setMatchResult('')
+    game.reset()
+    setPlayerTurn(true)
+    location.reload()
+  }
+  
   return (
     <div className="app">
-      <div className="w-full min-h-screen flex-col flex justify-center items-center relative bg-[url('/chessbg.png')] bg-cover">
+      <div className="w-full min-h-screen flex-col flex justify-center items-center relative gap-5 bg-[url('/chessbg.png')] bg-cover">
+        <div className="flex gap-4">
+          <Button
+            appearance="primary"
+            onClick={() => {
+              handleRestartGame()
+            }}
+          >
+            New game
+          </Button>
+          <Button
+            appearance="primary"
+            onClick={() => {
+              handleUndo()
+            }}
+          >
+            Undo
+          </Button>
+          <Button
+            appearance="primary"
+            onClick={() => {
+              handleRedo()
+            }}
+          >
+            Redo
+          </Button>
+        </div>
         <div className="sm:w-3/4 md:w-1/2 lg:w-1/3">
           {matchResult && (
             <div className="flex flex-col items-center p-5 gap-2 text-gray-900 dark:text-white z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow dark:bg-gray-700">
@@ -243,32 +301,19 @@ export default function Home() {
               </Button>
             </div>
           )}
-          <Chessboard position={gamePosition} onPieceDrop={onDrop} />
+          {!playerTurn && (
+            <div className="flex items-center p-5 gap-2 text-gray-900 dark:text-white z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
+              <div className="w-5 h-5 rounded-full bg-pink-700 animate-bounce [animation-delay:-0.3s]" />
+              <div className="w-5 h-5 rounded-full bg-pink-700 animate-bounce [animation-delay:-0.15s]" />
+              <div className="w-5 h-5 rounded-full bg-pink-700 animate-bounce" />
+            </div>
+          )}
+          <Chessboard
+            position={gamePosition}
+            onPieceDrop={onDrop}
+            arePiecesDraggable={playerTurn}
+          />
         </div>
-        <Button
-        appearance="primary"
-        onClick={() => {
-          handleRestartGame()
-        }}
-      >
-        New game
-      </Button>
-      <Button
-        appearance="primary"
-        onClick={() => {
-          handleUndo()
-        }}
-      >
-        Undo
-      </Button>
-      <Button
-        appearance="primary"
-        onClick={() => {
-          handleRedo()
-        }}
-      >
-        Redo
-      </Button>
       </div>
     </div>
   )
