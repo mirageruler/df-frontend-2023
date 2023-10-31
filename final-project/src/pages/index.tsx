@@ -99,8 +99,7 @@ export default function Home() {
               setPlayerTurn(true)
               return
             }
-            const botMove = game.move(botMoveString)
-            console.log("botMove:", botMove)
+            game.move(botMoveString)
             setGamePosition(game.fen())
           msgs.current[msgs.current.length - 1].content = `${msgs.current[msgs.current.length - 1].content} ${botMoveString}`
           turnNumber.current = turnNumber.current + 1
@@ -115,16 +114,17 @@ export default function Home() {
       setPlayerTurn(true)
       return
     }
+    if (undoStack.length > 1) {
+      undoStack.splice(-2)
+    }
     setPlayerTurn(true)
     setReadyToUndo(true)
     setReadyToRedo(false)
     setIsJustMakeMove(true)
-    console.log('undoStack by normal move:', undoStack)
   }
 
   const onDrop = (source: string, target: string, piece: string) => {
     if (playerTurn === false) {
-      console.log('What the flip')
       return false
     }
 
@@ -143,9 +143,8 @@ export default function Home() {
       }
     }
 
-    let userMove = {} as Move
     try {
-      userMove = game.move({
+      game.move({
         from: source,
         to: target,
         promotion: piece[1].toLowerCase() ?? 'q',
@@ -154,9 +153,7 @@ export default function Home() {
       return false
     }
 
-    if (userMove) {
-      console.log("userMove:", userMove)
-    }
+    
 
     setGamePosition(game.fen())
     setPlayerTurn(false)
@@ -164,7 +161,6 @@ export default function Home() {
   }
 
   const handleUndo = () => {
-    console.log('readyToUndo:', readyToUndo)
     if (isJustMakeMove) {
       const blackMove = game.undo();
     if (blackMove !== null) {
@@ -174,8 +170,6 @@ export default function Home() {
     if (whiteMove !== null) {
       undoStack.push(whiteMove)
     }
-    console.log('blackMove by Undo:', blackMove)
-    console.log('whiteMove by Undo:', whiteMove)
     setGamePosition(game.fen());
     turnNumber.current = turnNumber.current-1
     if (turnNumber.current === 0) { turnNumber.current = 1 }
@@ -190,8 +184,6 @@ export default function Home() {
     if (whiteMove !== null) {
       undoStack.unshift(whiteMove)
     }
-    console.log('blackMove by Undo:', blackMove)
-    console.log('whiteMove by Undo:', whiteMove)
     setGamePosition(game.fen());
     turnNumber.current = turnNumber.current-1
     if (turnNumber.current === 0) { turnNumber.current = 1 }
@@ -201,35 +193,31 @@ export default function Home() {
     setIsJustMakeMove(false)
     if (game.fen() === DEFAULT_POSITION) {
       setReadyToUndo(false)
-      // setReadyToRedo(false)
-      // undoStack = []
     }
-    console.log('undoStack by Undo:', undoStack)
   }
 
   const handleRedo = () => {
     if (readyToRedo) {
       const blackMove = undoStack.pop()
       if (blackMove) {
-        console.log('blackMove by Redo:', blackMove)
         game.move(blackMove)
       }
       const whiteMove = undoStack.pop()
       if (whiteMove) {
-        console.log('whiteMove by Redo:', whiteMove)
         game.move(whiteMove)
       }
-      setGamePosition(game.fen());
-      turnNumber.current = turnNumber.current+1
-      msgs.current[msgs.current.length - 1].content = `${msgs.current[msgs.current.length - 1].content}\n${turnNumber.current}. ${whiteMove?.san} ${blackMove?.san}`
-      if (undoStack.length === 0) {
-        setReadyToRedo(false)
+      if (blackMove || whiteMove) {
+        setGamePosition(game.fen());
+        turnNumber.current = turnNumber.current+1
+        msgs.current[msgs.current.length - 1].content = `${msgs.current[msgs.current.length - 1].content}\n${turnNumber.current}. ${whiteMove?.san} ${blackMove?.san}`
+        if (undoStack.length === 0) {
+          setReadyToRedo(false)
+        }
+        setReadyToUndo(true)
       }
-      setReadyToUndo(true)
     }
 
     setIsJustMakeMove(false)
-    console.log('undoStack by Redo:', undoStack)
   }
 
   function trimStringTillLastNewline(input: string): string {
