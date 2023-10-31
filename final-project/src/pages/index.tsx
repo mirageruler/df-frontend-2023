@@ -260,6 +260,9 @@ export default function Home() {
     setMatchResult('')
     game.reset()
     setPlayerTurn(true)
+    setReadyToUndo(false)
+    setReadyToRedo(false)
+    undoStack = []
     location.reload()
   }
   
